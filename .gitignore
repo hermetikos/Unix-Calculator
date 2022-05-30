@@ -1,1 +1,8 @@
+# YACC intermediary c files
 *.tab.c
+
+# C Output
+*.o
+
+# compiled executable
+*.out
