@@ -16,7 +16,7 @@ left association will parse a-b-c as (a-b)-c
 %left '+' '-' /* left associative, same precendence */
 %left '*' '/' /* left associative, same precendence */
 %left UNARYMINUS /* negative sign */
-/* %left UNARYPLUS */
+%left UNARYPLUS
 %%
 list: /* nothing */
     | list '\n'
@@ -25,7 +25,7 @@ list: /* nothing */
 expr:   NUMBER  { $$ = $1; }
     | '-' expr %prec UNARYMINUS { $$ = -$2; }
     /* declare that a - has the precedence of a unary minus op */
-    /* | '+' expr %prec UNARYPLUS { $$ = $2; } */
+    | '+' expr %prec UNARYPLUS { $$ = $2; }
     | expr '+' expr { $$ = $1 + $3; }
     | expr '-' expr { $$ = $1 - $3; }
     | expr '*' expr { $$ = $1 * $3; }
