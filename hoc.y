@@ -14,7 +14,7 @@ these clarify the associativity, basically how the order of operations works
 left association will parse a-b-c as (a-b)-c
  */
 %left '+' '-' /* left associative, same precendence */
-%left '*' '/' /* left associative, same precendence */
+%left '*' '/' '%' /* left associative, same precendence */
 %left UNARYMINUS /* negative sign */
 %left UNARYPLUS
 %%
@@ -30,6 +30,7 @@ expr:   NUMBER  { $$ = $1; }
     | expr '-' expr { $$ = $1 - $3; }
     | expr '*' expr { $$ = $1 * $3; }
     | expr '/' expr { $$ = $1 / $3; }
+    | expr '%' expr { $$ = fmod($1, $3); }
     | '(' expr ')'  { $$ = $2; }
     ;
 %%
