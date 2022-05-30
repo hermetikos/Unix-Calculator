@@ -37,6 +37,7 @@ expr:   NUMBER  { $$ = $1; }
 
 #include <stdio.h>
 #include <ctype.h>
+#include <math.h>
 
 /* for error messages */
 char* progname; 
@@ -55,7 +56,7 @@ yylex()
     int c;
 
     // trim whitespace
-    while ((c=getchar())) == ' ' || c == '\t');
+    while ((c=getchar()) == ' ' || c == '\t');
     // if we've reached EOF, end parsing
     if (c == EOF)
         return 0;
@@ -76,4 +77,23 @@ yylex()
     if (c == '\n')
         lineno++;
     return c;
+}
+
+// handles yacc syntax error
+yyerror(s)
+    char* s;
+{
+    warning(s, (char*) 0);
+}
+
+// print warning message
+warning(s, t)
+    char *s, *t;
+{
+    fprintf(stderr, "%s: %s", progname, s);
+    if(t)
+    {
+        fprintf(stderr, " %s", t);
+        fprintf(stderr, " near line %d\n", lineno);
+    }
 }
