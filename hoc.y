@@ -15,8 +15,8 @@ left association will parse a-b-c as (a-b)-c
  */
 %left '+' '-' /* left associative, same precendence */
 %left '*' '/' '%' /* left associative, same precendence */
-%left UNARYMINUS /* negative sign */
 %left UNARYPLUS
+%left UNARYMINUS /* negative sign */
 %%
 list: /* nothing */
     | list '\n'
