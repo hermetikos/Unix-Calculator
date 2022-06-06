@@ -1,37 +1,51 @@
 %{
-#define YYSTYPE double
-/* data type of yacc stack
-the default data type is int
-so we override it and set it to double
-*/    
+double mem[26]; // for variables a-z
 %}
+%union {
+    double val; // the actual value
+    int index;  // the index into mem[]
+    // this makes it so that stack elements are either an double (a number)
+    // or a character (a variable, we are only using single chars as vars)
+}
 /* Syntactic classes begin with %
 any string with more than one char needs a syntactic class defined
 single chars don't need them */
-%token NUMBER
+%token <val> NUMBER
 /* 
 these clarify the associativity, basically how the order of operations works
 left association will parse a-b-c as (a-b)-c
  */
+%token <index> VAR
+%type <val> expr
 %left '+' '-' /* left associative, same precendence */
 %left '*' '/' '%' /* left associative, same precendence */
-%left UNARYPLUS
 %left UNARYMINUS /* negative sign */
 %%
 list: /* nothing */
     | list '\n'
     | list expr '\n' { printf("\t%.8g\n", $2); }
+    | list error { yyerrok; }
     ;
-expr:   NUMBER  { $$ = $1; }
-    | '-' expr %prec UNARYMINUS { $$ = -$2; }
-    /* declare that a - has the precedence of a unary minus op */
-    | '+' expr %prec UNARYPLUS { $$ = $2; }
+expr:   NUMBER
+    | VAR { $$ = mem[$1]; }
+    | VAR '=' expr { $$ = mem[$1] = $3; }
     | expr '+' expr { $$ = $1 + $3; }
     | expr '-' expr { $$ = $1 - $3; }
     | expr '*' expr { $$ = $1 * $3; }
-    | expr '/' expr { $$ = $1 / $3; }
-    | expr '%' expr { $$ = fmod($1, $3); }
-    | '(' expr ')'  { $$ = $2; }
+    | expr '/' expr { 
+        if ($3 == 0.0)
+            execerror("division by zero", "");
+        $$ = $1 / $3; 
+    }    
+    | expr '%' expr { 
+        if ($3 == 0.0)
+            execerror("modulo by zero", "");
+        $$ = fmod($1, $3);
+    }
+    | '(' expr ')'  { $$ = $2; }    
+    | '+' expr %prec UNARYMINUS { $$ = $2; }
+    | '-' expr %prec UNARYMINUS { $$ = -$2; }
+    /* declare that a - has the precedence of a unary minus op */
     ;
 %%
 
